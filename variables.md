@@ -1,6 +1,6 @@
 ### Variables
 
-We can use multiple types to pass the values for variables in shell script. in shell scripting variable declaration is like below.
+There multiple types to pass the values for variables in shell script. in shell scripting variable declaration is like below.
 
 ```
 VAR_NAME=SOME_VALUE

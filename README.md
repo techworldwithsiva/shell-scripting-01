@@ -22,9 +22,9 @@ If you were given a task, instead of running multiple commands to complete the t
 
 ### Coding
 Coding is 2 types.
-* Programming <br/>
+* **Programming** <br/>
     Programming can be done by developers. Usually it has complex coding like data base transactions, session management, triggering communications, etc. Developers should write code in an effective way that should consume less memory and less time more speed.
-* Scripting <br/>
+* **Scripting** <br/>
     Scripting is done by generally system admins, DevOps, Cloud, Database admins, developers, etc. Scripting is usually automating manual tasks like
     * Deleting old files
     * Installing packages
