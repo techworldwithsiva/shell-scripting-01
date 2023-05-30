@@ -1,6 +1,6 @@
 ### Shell Scripting
 
-Register For course: [Shell Scripting Course](https://bit.ly/shell-siva)
+Register For course: [Shell Scripting Course](https://bit.ly/shell-siva){:target="_blank"}
 
 If you were given a task, instead of running multiple commands to complete the task manually, you can simply put those commands in a file and run it as a script that does the task without human errors.
 
