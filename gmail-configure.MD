@@ -51,7 +51,7 @@ Add the following line to the file:
 vi /etc/postfix/sasl_passwd
 ```
 ```
- [smtp.gmail.com]:587 xyz:AppPassword
+[smtp.gmail.com]:587 xyz:AppPassword
  ```
  **Note: xyz is from xyz@gmail.com, password_app is from google management app password**
 
