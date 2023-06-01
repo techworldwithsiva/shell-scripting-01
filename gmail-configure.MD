@@ -50,7 +50,10 @@ Add the following line to the file:
 ```
 vi /etc/postfix/sasl_passwd
 ```
- [smtp.gmail.com]:587 xyz:AppPassword (Note: xyz is from xyz@gmail.com, password_app is from goog management app password )
+```
+ [smtp.gmail.com]:587 xyz:AppPassword
+ ```
+ **Note: xyz is from xyz@gmail.com, password_app is from google management app password**
 
 * Create a Postfix lookup table from the sasl_passwd text file by running the following command:
 ```
