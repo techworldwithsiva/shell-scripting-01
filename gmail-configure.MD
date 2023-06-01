@@ -1,5 +1,5 @@
 switch to root (sudo su - )
-Step 1. yum update -y
+Step 1. yum update -y --exclude=kernel*
 Step 2. Install Postfix, the SASL authentication framework, and mailx.
  yum -y install postfix cyrus-sasl-plain mailx
 Step 3. Restart Postfix to detect the SASL framework.
