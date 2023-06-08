@@ -8,32 +8,31 @@ USAGE(){
 USERID=$(id -u)
 DATE=$(date +%F)
 LOGFILE="$DATE.log"
+
+#colors
 R="\e[31m"
 G="\e[32m"
 N="\e[0m"
 Y="\e[33m"
 TOMCAT_VERSION=$1 #9.0.75
 
-
-
 if [ -z $TOMCAT_VERSION ]
 then
     USAGE
     exit 1
 fi
+
 #extracting tomcat major version
 TOMCAT_MAJOR_VERSION=$(echo $TOMCAT_VERSION | cut -d "." -f1)
-
 #forming download URL
 TOMCAT_URL=https://dlcdn.apache.org/tomcat/tomcat-$TOMCAT_MAJOR_VERSION/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
-
 #forming tar file
 TOMCAT_TAR_FILE=$(echo $TOMCAT_URL | awk -F "/" '{print $NF}')
-
 #forming tomcat dir
 TOMCAT_DIR=$(echo $TOMCAT_TAR_FILE | sed -e 's/.tar.gz//g')
-
+#student application file
 STUDENT_WAR_FILE=https://raw.githubusercontent.com/techworldwithsiva/shell-scripting-01/master/application/student.war
+#MySQl Connector
 MYSQL_DRIVER=https://raw.githubusercontent.com/techworldwithsiva/shell-scripting-01/master/application/mysql-connector-5.1.18.jar
 
 if [ $USERID -ne 0 ]
@@ -52,6 +51,11 @@ VALIDATE(){
     fi
 }
 
+# SELINUX to enable traffic from Nginx to tomcat
+yum install policycoreutils-python-utils -y &>>$LOGFILE
+VALIDATE $? "SELINUX related pacakges"
+setsebool -P httpd_can_network_connect 1 &>>$LOGFILE
+VALIDATE $? "Allow Nginx to Tomcat"
 
 #install basic commands
 yum install wget vim net-tools java-1.8.0-openjdk-devel -y &>>$LOGFILE
@@ -68,6 +72,7 @@ VALIDATE $? "Starting MariaDB"
 systemctl enable mariadb &>>$LOGFILE
 VALIDATE $? "Enabling MariaDB"
 
+#creating schema, table and granting priveleges
 echo "create database if not exists studentapp;
 use studentapp;
 
@@ -107,6 +112,11 @@ VALIDATE $? "Removed existing DB config"
 sed -i '$ i <Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource" maxTotal="100" maxIdle="30" maxWaitMillis="10000" username="student" password="student@1" driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/studentapp"/>' context.xml
 VALIDATE $? "Added DB resource in context.xml"
 
+cd ../bin
+sh shutdown.sh &>>$LOGFILE
+sh startup.sh &>>$LOGFILE
+VALIDATE $? "Tomcat started"
+
 #NgINX
 yum install nginx -y &>>$LOGFILE
 VALIDATE $? "Installing Nginx"
@@ -120,18 +130,6 @@ VALIDATE $? "Added student.conf"
 
 sed -i '/location \/ {/,/}/d' /etc/nginx/nginx.conf
 VALIDATE $? "Removed default location block"
-
-# SELINUX to enable traffic from Nginx to tomcat
-yum install policycoreutils-python-utils -y &>>$LOGFILE
-VALIDATE $? "SELINUX related pacakges"
-audit2allow -a -M nginx_tomcat_connect &>>$LOGFILE
-semodule -i nginx_tomcat_connect.pp
-VALIDATE $? "Allow Nginx to Tomcat"
-
-cd /opt/tomcat/$TOMCAT_DIR/bin
-sh shutdown.sh &>>$LOGFILE
-sh startup.sh &>>$LOGFILE
-VALIDATE $? "Tomcat started"
 
 systemctl restart nginx
 VALIDATE $? "NgInx restarted"
