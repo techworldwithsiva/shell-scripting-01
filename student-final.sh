@@ -52,12 +52,6 @@ VALIDATE(){
     fi
 }
 
-# SELINUX to enable traffic from Nginx to tomcat
-yum install policycoreutils-python-utils -y &>>$LOGFILE
-VALIDATE $? "SELINUX related pacakges"
-audit2allow -a -M nginx_tomcat_connect &>>$LOGFILE
-semodule -i nginx_tomcat_connect.pp
-VALIDATE $? "Allow Nginx to Tomcat"
 
 #install basic commands
 yum install wget vim net-tools java-1.8.0-openjdk-devel -y &>>$LOGFILE
@@ -113,11 +107,6 @@ VALIDATE $? "Removed existing DB config"
 sed -i '$ i <Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource" maxTotal="100" maxIdle="30" maxWaitMillis="10000" username="student" password="student@1" driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/studentapp"/>' context.xml
 VALIDATE $? "Added DB resource in context.xml"
 
-cd ../bin
-sh shutdown.sh &>>$LOGFILE
-sh startup.sh &>>$LOGFILE
-VALIDATE $? "Tomcat started"
-
 #NgINX
 yum install nginx -y &>>$LOGFILE
 VALIDATE $? "Installing Nginx"
@@ -131,6 +120,18 @@ VALIDATE $? "Added student.conf"
 
 sed -i '/location \/ {/,/}/d' /etc/nginx/nginx.conf
 VALIDATE $? "Removed default location block"
+
+# SELINUX to enable traffic from Nginx to tomcat
+yum install policycoreutils-python-utils -y &>>$LOGFILE
+VALIDATE $? "SELINUX related pacakges"
+audit2allow -a -M nginx_tomcat_connect &>>$LOGFILE
+semodule -i nginx_tomcat_connect.pp
+VALIDATE $? "Allow Nginx to Tomcat"
+
+cd /opt/tomcat/$TOMCAT_DIR/bin
+sh shutdown.sh &>>$LOGFILE
+sh startup.sh &>>$LOGFILE
+VALIDATE $? "Tomcat started"
 
 systemctl restart nginx
 VALIDATE $? "NgInx restarted"
